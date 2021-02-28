@@ -1,0 +1,5 @@
+docker_root_dir: /data/docker
+docker_storage_driver: overlay
+docker_log_driver: json-file
+docker_log_max_size: 100m
+docker_log_max_file: 3

@@ -1,0 +1,56 @@
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- include: RedHat.yml
+  when: ansible_os_family == 'RedHat'
+  tags: install
+
+- include: Debian.yml
+  when: ansible_os_family == 'Debian'
+  tags: install
+
+- name: Install docker
+  package:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: latest
+  tags: install
+
+- name: pip uninstall docker_py
+  pip:
+    name: docker_py
+    state: absent
+  tags: install
+
+- name: pip install docker 
+  pip:
+    name: docker
+    extra_args: --upgrade
+  tags: install
+
+
+- name: Ensure Docker is started and enabled at boot.
+  service:
+    name: docker
+    state: started
+    enabled: true
+  tags: install
+
+- name: Copying config docker daemon
+  template:
+    src: "daemon.json.j2"
+    dest: "/etc/docker/daemon.json"
+    owner: root
+    group: root
+    mode: 0644
+  tags: config
+
+- name: Restart service Docker.
+  service:
+    name: docker
+    state: restarted
+    enabled: true
+  tags: config
+

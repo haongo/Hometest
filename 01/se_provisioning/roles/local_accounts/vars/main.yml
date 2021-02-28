@@ -1,0 +1,13 @@
+bot_users_list:
+  - username: autobot
+    type: admin
+    state: present
+
+sysadmin_users_list:
+  - username: sysadmin01
+    type: admin
+    state: present
+  - username: sysadmin02
+    type: admin
+    state: present
+

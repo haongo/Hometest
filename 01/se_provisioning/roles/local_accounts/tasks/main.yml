@@ -1,0 +1,36 @@
+- name: Wait for server to boot up
+  local_action:
+    module: wait_for
+      host="{{ inventory_hostname }}"
+      port=22
+      delay=1
+      timeout=300
+  become: false
+
+- name: Adding User sysadmin
+  user:
+    name: "{{ item.username }}"
+    shell: /bin/bash
+    uid: "{{ item.uid | default(5000|random) }}"
+    state: "{{ item.state | default('present') }}"
+  with_items: "{{ sysadmin_users_list }}"
+  ignore_errors: yes
+
+- name: Setup | authorized key upload
+  authorized_key: 
+    user: "{{ item.username }}"
+    key: "{{ lookup('file', 'files/{{ item.username }}.pub') }}"
+  when: item.get('state', 'present') == 'present'
+  with_items: "{{ sysadmin_users_list }}"
+  ignore_errors: yes
+
+- name: Assign sudo role to the admin users
+  copy:
+    content: "{{ item.username }} ALL=(ALL) NOPASSWD:ALL"
+    dest: "/etc/sudoers.d/99-{{ item.username }}"
+    mode: 0440
+    owner: root
+    group: root
+  when: item.type is defined and item.type == 'admin' and item.get('state', 'present') == 'present'
+  with_items: "{{ sysadmin_users_list }}"
+  ignore_errors: yes

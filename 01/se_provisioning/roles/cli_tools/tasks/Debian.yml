@@ -1,0 +1,6 @@
+- name: Update apt cache
+  apt: update_cache=yes
+
+# tasks file for yum_update
+- name: Apt Upgrade packages
+  apt: upgrade=dist

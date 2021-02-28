@@ -1,0 +1,26 @@
+- name: Include OS-specific variables.
+  include_vars: "{{ ansible_os_family }}.yml"
+
+- include: RedHat.yml
+  when: ansible_os_family == 'RedHat'
+  tags: update
+
+- include: Debian.yml
+  when: ansible_os_family == 'Debian'
+  tags: update
+
+- name: Install base package
+  package:
+    name:
+     - "{{ item }}"
+    state: latest
+  with_items: "{{ packages }}"
+  tags: install
+
+- name: Install base package with OS
+  package:
+    name:
+     - "{{ item }}"
+    state: latest
+  with_items: "{{ packages_os }}"
+  tags: install

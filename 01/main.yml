@@ -1,0 +1,13 @@
+---
+- hosts: "{{ target }}"
+  become: yes
+  gather_facts: true
+  environment:
+    PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
+  # Gather facts false here as else it will fail if the server is not up yet
+  roles:
+      - hostname
+      - local_accounts
+      - cli_tools
+      - tunning_kernel
+      - docker
